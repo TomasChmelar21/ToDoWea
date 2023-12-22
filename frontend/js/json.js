@@ -26,7 +26,7 @@ function getUsers() {
         };
 
         // Asynchronous requests
-        xhr.open("GET", `http://localhost:6969/usersjson`, true);
+        xhr.open("GET", `https://tomaschmelarapp-backend.onrender.com/usersjson`, true);
         // Send the request over the network
         xhr.send(null);
     } else {

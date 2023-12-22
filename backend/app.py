@@ -41,46 +41,67 @@ def get_users_datas():
 
 @app.route('/users', methods=["POST"])
 def users():
-
     if request.method == "POST":
-        received_data = request.get_json()
-        print(f"received data: {received_data}")
+        try:
+            # Ověření a dekódování JWT tokenu
+            token = request.headers.get('Authorization').split('Bearer ')[1]
+            decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+            username = decoded_token['username']
 
-        # Get the username from the request or set a default value if not present
-        username = received_data.get("user", "default_username")
+            received_data = request.get_json()
+            print(f"Received data: {received_data}")
 
-        # Create a new record with the specified structure including the username
-        new_record = {
-            "text": received_data.get("text", ""),
-            "user": username,
-            "hotovo": 0
-        }
+            # Vložení uživatelského jména z tokenu do záznamu
+            new_record = {
+                "text": received_data.get("text", ""),
+                "user": username,
+                "hotovo": 0
+            }
 
-        # Load existing data
+            # Načtení existujících dat
+            with open("tasks.json", "r") as f:
+                data = json.load(f)
+
+            # Přidání nového záznamu k existujícím datům
+            data.append(new_record)
+
+            # Uložení aktualizovaných dat zpět do souboru
+            with open("tasks.json", "w") as f:
+                json.dump(data, f, indent=2)
+
+            return_data = {
+                "status": "success",
+                "message": f"Data added: {new_record}",
+                "records": data  # Zahrnout aktualizovaný seznam záznamů do odpovědi
+            }
+            return jsonify(return_data), 201
+
+        except jwt.ExpiredSignatureError:
+            return jsonify({"status": "error", "message": "Token expiroval"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"status": "error", "message": "Neplatný token"}), 401
+        
+@app.route('/users/filtr/<token>', methods=["GET"])
+def get_user_data(token):
+    try:
+        # Ověření a dekódování JWT tokenu
+        print(token)
+        decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+        username = decoded_token['username']
+        print(username)
         with open("tasks.json", "r") as f:
             data = json.load(f)
 
-        # Append the new record to the existing data
-        data.append(new_record)
+        # Filtrace záznamů podle uživatelského jména
+        user_tasks = [task for task in data if task["user"] == username]
 
-        # Save the updated data back to the file
-        with open("tasks.json", "w") as f:
-            json.dump(data, f, indent=2)
+        return jsonify(user_tasks)
 
-        return_data = {
-            "status": "success",
-            "message": f"Data added: {new_record}",
-            "records": data  # Include the updated list of records in the response
-        }
-        return jsonify(return_data), 201
-
-@app.route('/users/filtr/<username>', methods=["GET"])
-def get_user_data(username):
-    with open("tasks.json", "r") as f:
-        data = json.load(f)
-    user_tasks = [task for task in data if task["user"] == username]
-    return jsonify(user_tasks)
-
+    except jwt.ExpiredSignatureError:
+        return jsonify({"status": "error", "message": "Token expiroval"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"status": "error", "message": "Neplatný token"}), 401
+    
 @app.route('/users/hotovo/<text>', methods=["PUT"])
 def update_hotovo(text):
     print(f"Update hotovo endpoint reached for '{text}'...")
@@ -136,27 +157,45 @@ def delete_record(text):
 
     return jsonify({"status": "success", "message": f"Record '{text}' deleted."})
 
-@app.route('/users/hotovo/<username>', methods=["GET"])
-def hotovo(username):
-    print("hotovo endpoint reached...")
-    with open("tasks.json", "r") as f:
-        data = json.load(f)
-    data_user = [task for task in data if task["user"] == username]
-    # Filter records with 'hotovo' equal to 1
-    completed_records = [record for record in data_user if record["hotovo"] == 1]
+@app.route('/users/hotovo/<token>', methods=["GET"])
+def hotovo(token):   
+    try:
+        # Ověření a dekódování JWT tokenu
+        decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+        username = decoded_token['username']
 
-    return jsonify(completed_records)
+        with open("tasks.json", "r") as f:
+            data = json.load(f)
 
-@app.route('/users/nesplneno/<username>', methods=["GET"])
-def nesplneno(username):
-    print("nesplneno endpoint reached...")
-    with open("tasks.json", "r") as f:
-        data = json.load(f)
-    data_user = [task for task in data if task["user"] == username]
-    # Filter records with 'hotovo' equal to 0
-    uncompleted_records = [record for record in data_user if record["hotovo"] == 0]
+        # Filtrace nehotových záznamů podle uživatelského jména
+        completed_records = [record for record in data if record["user"] == username and record["hotovo"] == 1]
 
-    return jsonify(uncompleted_records)
+        return jsonify(completed_records)
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"status": "error", "message": "Token expiroval"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"status": "error", "message": "Neplatný token"}), 401
+
+@app.route('/users/nesplneno/<token>', methods=["GET"])
+def nesplneno(token):
+    try:
+        # Ověření a dekódování JWT tokenu
+        decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+        username = decoded_token['username']
+
+        with open("tasks.json", "r") as f:
+            data = json.load(f)
+
+        # Filtrace nehotových záznamů podle uživatelského jména
+        uncompleted_records = [record for record in data if record["user"] == username and record["hotovo"] == 0]
+
+        return jsonify(uncompleted_records)
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"status": "error", "message": "Token expiroval"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"status": "error", "message": "Neplatný token"}), 401
 
 @app.route('/login', methods=["POST"])
 def login():
@@ -184,9 +223,7 @@ def login():
 
     return jsonify({"status": "error", "message": "Invalid credentials"}), 401  # Unauthorized
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+
 
 if __name__ == "__main__":
     app.run("localhost", 6969)

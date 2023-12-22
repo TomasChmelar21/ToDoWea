@@ -224,8 +224,8 @@ function getUsers(endpoint = 'filtr') {
     xhr = getXmlHttpRequestObject();
     xhr.onreadystatechange = dataCallback;
     // Asynchronous requests
-    username = getCookie('username');
-    xhr.open("GET", `http://localhost:6969/users/${endpoint}/${username}`, true);
+    token = getCookie('token');
+    xhr.open("GET", `http://localhost:6969/users/${endpoint}/${token}`, true);
     // Send the request over the network
     xhr.send(null);
 }
@@ -270,21 +270,34 @@ function sendData() {
 
     console.log("Sending data: " + dataToSend);
 
-    // Get the username from localStorage
-    var username = getCookie('username');
-
     // Create the data object with the desired structure
     var newData = {
         "text": dataToSend,
-        "user": username,  // Use the username retrieved from localStorage
+        "token": token,  // Use the token retrieved from cookies
         "hotovo": 0
     };
 
-    xhr = getXmlHttpRequestObject();
-    xhr.onreadystatechange = sendDataCallback;
-    // Asynchronous requests
+    // Create a new XMLHttpRequest object
+    var xhr = getXmlHttpRequestObject();
+
+    // Define the callback function
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            if (xhr.status == 201) {
+                console.log("Data added successfully.");
+                // Optionally, update the UI or perform other actions
+                getUsers();
+            } else {
+                console.error("Failed to add data.");
+                // Optionally, handle errors or display a message to the user
+            }
+        }
+    };
+
+    // Asynchronous request
     xhr.open("POST", "http://localhost:6969/users", true);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.setRequestHeader("Authorization", "Bearer " + token);
     // Send the request over the network with the JSON data
     xhr.send(JSON.stringify(newData));
 }
