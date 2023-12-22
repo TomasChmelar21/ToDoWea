@@ -9,43 +9,49 @@ function getXmlHttpRequestObject() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-    var token = localStorage.getItem('token');
+    var token = getCookie('token');
 
     if (isValidToken(token)) {
         getUsers();
     } else {
         console.error("Invalid token. Access denied.");
-        // Optionally, you can disable or hide functionality here
+        window.location.href = './index.html';
     }
 });
 
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    
+    if (parts.length === 2) {
+        return parts.pop().split(';').shift();
+    }
+}
 
+function logout() {
+    // Clear the cookies
+    document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+
+    // Redirect the user to the login page
+    window.location.href = './index.html';
+}
 
 function dataCallback() {
-    // Check if the response is ready
     if (xhr.readyState == 4) {
         if (xhr.status == 200) {
             console.log("User data received!");
-            var token = localStorage.getItem('token');
-            var username = localStorage.getItem('username');
-            
-            // Validate the JWT token
-            if (isValidToken(token)) {
-                console.log("Token:", token);
-                console.log("username:", username);
-                var dataDiv = document.getElementById('result-container');
-                // Parse the JSON response
-                var responseData = JSON.parse(xhr.responseText);
+            var token = getCookie('token');
+            var username = getCookie('username');
 
-                // Apply the filter, if any
+            if (isValidToken(token)) {
+                var dataDiv = document.getElementById('result-container');
+                var responseData = JSON.parse(xhr.responseText);
                 var filterType = document.querySelector('input[name="filter"]:checked')?.value;
 
-                // Generate HTML for each record based on the filter and username
                 var recordsHTML = responseData.map(function (item) {
-                    // Check if the record is completed (hotovo is 1)
                     var isCompleted = item.hotovo === 1;
 
-                    // Apply the filter, if any, and only show records where the username matches
                     if (
                         (filterType === 'completed' && !isCompleted) ||
                         (filterType === 'uncompleted' && isCompleted) ||
@@ -66,12 +72,9 @@ function dataCallback() {
                     `;
                 });
 
-                // Set current data HTML
                 dataDiv.innerHTML = recordsHTML.join('');
             } else {
                 console.error("Invalid token. Access denied.");
-
-                // Redirect to ../index.html on invalid token
                 window.location.href = '../index.html';
             }
         } else {
@@ -115,7 +118,7 @@ function isValidToken(token) {
 
 
 function markAsDone(text) {
-    var token = localStorage.getItem('token');
+    var token = getCookie('token');
 
     if (isValidToken(token)) {
         // Show a confirmation dialog
@@ -134,7 +137,7 @@ function markAsDone(text) {
 
 function updateRecord(endpoint, data = null) {
     // Check for a valid token
-    var token = localStorage.getItem('token');
+    var token = getCookie('token');
     if (!isValidToken(token)) {
         console.error("Invalid token. Access denied.");
         // Optionally, you can disable or hide functionality here
@@ -189,7 +192,7 @@ function deleteRecord(text) {
 
 function deleteRecordOnServer(text) {
     // Check for a valid token
-    var token = localStorage.getItem('token');
+    var token = getCookie('token');
     if (!isValidToken(token)) {
         console.error("Invalid token. Access denied.");
         // Optionally, you can disable or hide functionality here
@@ -217,12 +220,12 @@ function deleteRecordOnServer(text) {
     xhr.send();
 }
 
-function getUsers(endpoint = 'users') {
-    console.log("Get users...");
+function getUsers(endpoint = 'filtr') {
     xhr = getXmlHttpRequestObject();
     xhr.onreadystatechange = dataCallback;
     // Asynchronous requests
-    xhr.open("GET", `http://localhost:6969/${endpoint}`, true);
+    username = getCookie('username');
+    xhr.open("GET", `http://localhost:6969/users/${endpoint}/${username}`, true);
     // Send the request over the network
     xhr.send(null);
 }
@@ -243,20 +246,23 @@ function sendDataCallback() {
 
 function filterTasks(filterType) {
     // Call the server to get filtered data
-    var endpoint = filterType === 'completed' ? 'hotovo' : (filterType === 'uncompleted' ? 'nesplneno' : 'users');
-    getUsers(endpoint);
+    var endpoint;
+    if(filterType == "all"){ getUsers();}
+    else{
+    endpoint = filterType === 'completed' ? 'hotovo' : (filterType === 'uncompleted' ? 'nesplneno' : 'users');
+    getUsers(endpoint);}
 }
 
 function sendData() {
     // Check for a valid token
-    var token = localStorage.getItem('token');
+    var token = getCookie('token');
     if (!isValidToken(token)) {
         console.error("Invalid token. Access denied.");
         // Optionally, you can disable or hide functionality here
         return;
     }
 
-    var dataToSend = document.getElementById('data-input').value;
+    var dataToSend = xssFilters.inHTMLData(document.getElementById('data-input').value);
     if (!dataToSend) {
         console.log("Data is empty.");
         return;
@@ -265,7 +271,7 @@ function sendData() {
     console.log("Sending data: " + dataToSend);
 
     // Get the username from localStorage
-    var username = localStorage.getItem('username');
+    var username = getCookie('username');
 
     // Create the data object with the desired structure
     var newData = {
@@ -282,6 +288,7 @@ function sendData() {
     // Send the request over the network with the JSON data
     xhr.send(JSON.stringify(newData));
 }
+
 
 
 // Automatically fetch user data on application start

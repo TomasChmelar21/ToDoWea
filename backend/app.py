@@ -33,15 +33,14 @@ def authenticate(func):
 
     return wrapper
 
-from flask import request, jsonify
+@app.route('/usersjson', methods=["GET"])
+def get_users_datas():
+    with open("tasks.json", "r") as f:
+        data = json.load(f)
+    return jsonify(data)
 
-@app.route('/users', methods=["GET", "POST"])
+@app.route('/users', methods=["POST"])
 def users():
-    print("users endpoint reached...")
-    if request.method == "GET":
-        with open("tasks.json", "r") as f:
-            data = json.load(f)
-        return jsonify(data)
 
     if request.method == "POST":
         received_data = request.get_json()
@@ -75,7 +74,13 @@ def users():
         }
         return jsonify(return_data), 201
 
-    
+@app.route('/users/filtr/<username>', methods=["GET"])
+def get_user_data(username):
+    with open("tasks.json", "r") as f:
+        data = json.load(f)
+    user_tasks = [task for task in data if task["user"] == username]
+    return jsonify(user_tasks)
+
 @app.route('/users/hotovo/<text>', methods=["PUT"])
 def update_hotovo(text):
     print(f"Update hotovo endpoint reached for '{text}'...")
@@ -131,25 +136,25 @@ def delete_record(text):
 
     return jsonify({"status": "success", "message": f"Record '{text}' deleted."})
 
-@app.route('/hotovo', methods=["GET"])
-def hotovo():
+@app.route('/users/hotovo/<username>', methods=["GET"])
+def hotovo(username):
     print("hotovo endpoint reached...")
     with open("tasks.json", "r") as f:
         data = json.load(f)
-
+    data_user = [task for task in data if task["user"] == username]
     # Filter records with 'hotovo' equal to 1
-    completed_records = [record for record in data if record["hotovo"] == 1]
+    completed_records = [record for record in data_user if record["hotovo"] == 1]
 
     return jsonify(completed_records)
 
-@app.route('/nesplneno', methods=["GET"])
-def nesplneno():
+@app.route('/users/nesplneno/<username>', methods=["GET"])
+def nesplneno(username):
     print("nesplneno endpoint reached...")
     with open("tasks.json", "r") as f:
         data = json.load(f)
-
+    data_user = [task for task in data if task["user"] == username]
     # Filter records with 'hotovo' equal to 0
-    uncompleted_records = [record for record in data if record["hotovo"] == 0]
+    uncompleted_records = [record for record in data_user if record["hotovo"] == 0]
 
     return jsonify(uncompleted_records)
 
@@ -179,12 +184,6 @@ def login():
 
     return jsonify({"status": "error", "message": "Invalid credentials"}), 401  # Unauthorized
 
-
-# Protected route example
-@app.route('/frontend/index.html')
-@authenticate
-def protected_route():
-    return render_template('index.html', username=request.user['username'])
 
 
 if __name__ == "__main__":

@@ -20,11 +20,6 @@
     "hotovo": 1
   },
   {
-    "text": "admin adminovat",
-    "user": "admin",
-    "hotovo": 0
-  },
-  {
     "text": "admin add",
     "user": "admin",
     "hotovo": 0
@@ -32,6 +27,11 @@
   {
     "text": "ahojkovat",
     "user": "Pepa",
+    "hotovo": 0
+  },
+  {
+    "text": "admin spousta",
+    "user": "admin",
     "hotovo": 0
   }
 ]
