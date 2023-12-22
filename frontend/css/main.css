@@ -1,0 +1,42 @@
+/* main.css */
+
+/* Add your custom CSS styles here */
+.record-container {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 20px;
+}
+
+.record-container.completed {
+    background-color: #d9f6e0; /* Light green background color for completed records */
+}
+
+.record-text {
+    margin: 0;
+}
+
+.action-buttons {
+    display: flex;
+}
+
+.action-buttons button {
+    margin-right: 5px;
+}
+
+.task-input-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px; /* Volitelně - nastaví mezery kolem elementu */
+    width: 350px;
+}
+
+/* Přizpůsobení stylu tlačítka */
+.btn {
+    /* Vaše existující styly tlačítka */
+    margin-left: 10px; /* Volitelně - nastaví mezeru mezi tlačítkem a vstupem */
+}
