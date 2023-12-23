@@ -38,7 +38,10 @@ def authenticate(func):
 def get_users_datas():
     with open("tasks.json", "r") as f:
         data = json.load(f)
-    return jsonify(data)
+    
+    response = jsonify(data)
+    response.headers['Content-Type'] = 'application/json'
+    return response
 
 @app.route('/users', methods=["POST"])
 def users():
@@ -46,7 +49,7 @@ def users():
         try:
             # Ověření a dekódování JWT tokenu
             token = request.headers.get('Authorization').split('Bearer ')[1]
-            decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+            decoded_token = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
             username = decoded_token['username']
 
             received_data = request.get_json()
@@ -87,7 +90,7 @@ def get_user_data(token):
     try:
         # Ověření a dekódování JWT tokenu
         print(token)
-        decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+        decoded_token = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
         username = decoded_token['username']
         print(username)
         with open("tasks.json", "r") as f:
@@ -162,7 +165,7 @@ def delete_record(text):
 def hotovo(token):   
     try:
         # Ověření a dekódování JWT tokenu
-        decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+        decoded_token = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
         username = decoded_token['username']
 
         with open("tasks.json", "r") as f:
@@ -182,7 +185,7 @@ def hotovo(token):
 def nesplneno(token):
     try:
         # Ověření a dekódování JWT tokenu
-        decoded_token = jwt.decode(token, 'secret', algorithms=['HS256'])
+        decoded_token = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
         username = decoded_token['username']
 
         with open("tasks.json", "r") as f:
