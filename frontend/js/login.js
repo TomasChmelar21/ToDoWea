@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "password": password
         };
 
-        fetch(process.env.ADR + "/login", {
+        fetch(process.env.KEY + "/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
