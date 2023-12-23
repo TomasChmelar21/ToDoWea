@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "password": password
         };
 
-        fetch(process.env.KEY + "/login", {
+        fetch("https://tomaschmelarapp-backend.onrender.com/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
