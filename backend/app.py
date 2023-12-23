@@ -2,12 +2,13 @@ from flask import Flask, request, jsonify, Response, render_template, redirect, 
 from flask_cors import CORS
 import json
 import jwt
+import os
 
 
 app = Flask(__name__)
 CORS(app)
 
-app.config['SECRET_KEY'] = 'secret'
+app.config['SECRET_KEY'] = os.environ.get('KEY')
 
 # Define a decorator to check for authentication before each request
 def authenticate(func):
