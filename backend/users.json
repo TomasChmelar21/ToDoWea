@@ -5,13 +5,18 @@
       "password": "admin"
     },
     {
-      "id": "2",
+      "id": 2,
       "username": "Pepa",
       "password": "pepa"
     },
     {
-      "id": "3",
+      "id": 3,
       "username": "Moje",
       "password": "tvoje"
+    },
+    {
+      "id": 4,
+      "username": "eliska",
+      "password": "eliska"
     }
   ]

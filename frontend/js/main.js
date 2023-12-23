@@ -161,7 +161,7 @@ function updateRecord(endpoint, data = null) {
     };
 
     // Asynchronous request
-    xhr.open("PUT", `http://localhost:6969/users/${endpoint}`, true);
+    xhr.open("PUT", `https://tomaschmelarapp-backend.onrender.com/users/${endpoint}`, true);
     if (data !== null) {
         xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
         xhr.send(JSON.stringify(data));
@@ -216,7 +216,7 @@ function deleteRecordOnServer(text) {
     };
 
     // Asynchronous request
-    xhr.open("DELETE", `http://localhost:6969/users/smazat/${text}`, true);
+    xhr.open("DELETE", `https://tomaschmelarapp-backend.onrender.com/users/smazat/${text}`, true);
     xhr.send();
 }
 
@@ -225,7 +225,7 @@ function getUsers(endpoint = 'filtr') {
     xhr.onreadystatechange = dataCallback;
     // Asynchronous requests
     token = getCookie('token');
-    xhr.open("GET", `http://localhost:6969/users/${endpoint}/${token}`, true);
+    xhr.open("GET", `https://tomaschmelarapp-backend.onrender.com/users/${endpoint}/${token}`, true);
     // Send the request over the network
     xhr.send(null);
 }
@@ -295,7 +295,7 @@ function sendData() {
     };
 
     // Asynchronous request
-    xhr.open("POST", "http://localhost:6969/users", true);
+    xhr.open("POST", "https://tomaschmelarapp-backend.onrender.com/users", true);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.setRequestHeader("Authorization", "Bearer " + token);
     // Send the request over the network with the JSON data
