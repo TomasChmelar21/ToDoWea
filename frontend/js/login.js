@@ -25,6 +25,9 @@ document.addEventListener("DOMContentLoaded", function () {
             body: JSON.stringify(loginData)
         })
         .then(response => {
+            if (!response.ok) {
+                console.log("Login failed.");
+            }
 
             return response.json();
         })
