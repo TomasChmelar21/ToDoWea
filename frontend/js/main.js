@@ -183,8 +183,6 @@ function deleteRecordOnServer(text) {
     if (!isValidToken(token)) {
         logout()
     }
-
-    // Create a new XMLHttpRequest object 
     var xhr = new XMLHttpRequest();
 
     // Define the callback function
@@ -206,7 +204,6 @@ function deleteRecordOnServer(text) {
 function getUsers(endpoint = 'filtr') {
     xhr = getXmlHttpRequestObject();
     xhr.onreadystatechange = dataCallback;
-    // Asynchronous requests
     token = getCookie('token');
     xhr.open("GET", `https://tomaschmelarapp-backend.onrender.com/users/${endpoint}/${token}`, true);
     // Send the request over the network
@@ -225,7 +222,7 @@ function sendDataCallback() {
 }
 
 function filterTasks(filterType) {
-    // Call the server to get filtered data
+    // Call server to get filtered data
     var endpoint;
     if(filterType == "all"){ getUsers();}
     else{
@@ -249,7 +246,7 @@ function sendData() {
     // Create the data object with the desired structure
     var newData = {
         "text": dataToSend,
-        "token": token,  // Use the token retrieved from cookies
+        "token": token,
         "hotovo": 0
     };
 
@@ -260,7 +257,6 @@ function sendData() {
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
             if (xhr.status == 201) {
-                alert("Data added successfully.");
                 getUsers();
             } else {
                 alert("Failed to add data.");
@@ -272,7 +268,6 @@ function sendData() {
     xhr.open("POST", "https://tomaschmelarapp-backend.onrender.com/users", true);
     xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
     xhr.setRequestHeader("Authorization", "Bearer " + token);
-    // Send the request over the network with the JSON data
     xhr.send(JSON.stringify(newData));
 }
 

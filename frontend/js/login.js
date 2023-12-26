@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var password = xssFilters.inHTMLData(document.getElementById('password').value)
 
         if (!username || !password) {
-            alert("Nejsou vyplněná všechna okna");
+            document.getElementById('loginError').innerText = "Nejsou vyplněná všechna okna";
             return;
         }
 
