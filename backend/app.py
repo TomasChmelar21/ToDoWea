@@ -43,7 +43,7 @@ def get_users_datas():
     response.headers['Content-Type'] = 'application/json'
     return response
 
-@app.route('/users', methods=["POST"])
+@app.route('/users', methods=["POST"]) #tady
 def users():
     if request.method == "POST":
         try:
@@ -53,7 +53,6 @@ def users():
             username = decoded_token['username']
 
             received_data = request.get_json()
-            print(f"Received data: {received_data}")
 
             # Vložení uživatelského jména z tokenu do záznamu
             new_record = {
@@ -89,10 +88,8 @@ def users():
 def get_user_data(token):
     try:
         # Ověření a dekódování JWT tokenu
-        print(token)
         decoded_token = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
         username = decoded_token['username']
-        print(username)
         with open("tasks.json", "r") as f:
             data = json.load(f)
 
@@ -108,7 +105,6 @@ def get_user_data(token):
     
 @app.route('/users/hotovo/<text>', methods=["PUT"])
 def update_hotovo(text):
-    print(f"Update hotovo endpoint reached for '{text}'...")
     with open("tasks.json", "r") as f:
         data = json.load(f)
 
@@ -127,7 +123,6 @@ def update_hotovo(text):
 
 @app.route('/users/text/<text>', methods=["PUT"])
 def update_text(text):
-    print(f"Update text endpoint reached for '{text}'...")
     with open("tasks.json", "r") as f:
         data = json.load(f)
 
@@ -148,7 +143,6 @@ def update_text(text):
 
 @app.route('/users/smazat/<text>', methods=["DELETE"])
 def delete_record(text):
-    print(f"Delete record endpoint reached for '{text}'...")
     with open("tasks.json", "r") as f:
         data = json.load(f)
 
@@ -203,7 +197,6 @@ def nesplneno(token):
 
 @app.route('/login', methods=["POST"])
 def login():
-    print("login endpoint reached...")
     with open("users.json", "r") as user_file:
         users = json.load(user_file)
     received_data = request.get_json()
@@ -226,10 +219,6 @@ def login():
             })
 
     return jsonify({"status": "error", "message": "Invalid credentials"}), 401  # Unauthorized
-
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
 
 if __name__ == "__main__":
     app.run("0.0.0.0", 6969)
