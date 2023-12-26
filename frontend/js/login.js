@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var password = xssFilters.inHTMLData(document.getElementById('password').value)
 
         if (!username || !password) {
-            console.log("Username and password are required.");
+            document.getElementById('loginError').innerText = "Nejsou vyplněná všechna okna";
             return;
         }
 
@@ -26,9 +26,8 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (!response.ok) {
-                throw new Error("Login failed.");
+                alert("Login failed.");
             }
-            console.log("Login response received!");
 
             return response.json();
         })
@@ -45,9 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
             window.location.href = './list.html';
         })
         .catch(error => {
-            console.error("Login failed.", error);
-            // Display an error message on the webpage
-            document.getElementById('loginError').innerText = "Invalid credentials. Please try again.";
+            document.getElementById('loginError').innerText = "Neplatné přihlašovací údaje";
         });
     });
 });

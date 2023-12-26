@@ -14,8 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (isValidToken(token)) {
         getUsers();
     } else {
-        console.error("Invalid token. Access denied.");
-        window.location.href = './index.html';
+        logout();
     }
 });
 
@@ -39,7 +38,6 @@ function logout() {
 function dataCallback() {
     if (xhr.readyState == 4) {
         if (xhr.status == 200) {
-            console.log("User data received!");
             var token = getCookie('token');
 
             if (isValidToken(token)) {
@@ -71,11 +69,10 @@ function dataCallback() {
 
                 dataDiv.innerHTML = recordsHTML.join('');
             } else {
-                console.error("Invalid token. Access denied.");
-                window.location.href = '../index.html';
+                logout()
             }
         } else {
-            console.error("Failed to fetch user data.");
+            logout()
         }
     }
 }
@@ -99,16 +96,14 @@ function isValidToken(token) {
         const currentTime = new Date().getTime();
 
         if (currentTime > expirationTime) {
-            console.error("Token has expired.");
-            return false;
+            logout()
         }
 
         // Additional validation checks can be added here
 
         return true;
     } catch (error) {
-        console.error("Error decoding or validating token:", error);
-        return false;
+        logout()
     }
 }
 
@@ -126,8 +121,7 @@ function markAsDone(text) {
             updateRecord(`hotovo/${encodeURIComponent(text)}`);
         }
     } else {
-        console.error("Invalid token. Access denied.");
-        // Optionally, you can disable or hide functionality here
+        logout()
     }
 }
 
@@ -136,9 +130,7 @@ function updateRecord(endpoint, data = null) {
     // Check for a valid token
     var token = getCookie('token');
     if (!isValidToken(token)) {
-        console.error("Invalid token. Access denied.");
-        // Optionally, you can disable or hide functionality here
-        return;
+        logout()
     }
 
     // Create a new XMLHttpRequest object 
@@ -148,11 +140,9 @@ function updateRecord(endpoint, data = null) {
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             if (xhr.status == 200) {
-                console.log("Update response received!");
-                // Update the record list after successful update
                 getUsers();
             } else {
-                console.error("Failed to update record.");
+                alert("failed to update")
             }
         }
     };
@@ -191,9 +181,7 @@ function deleteRecordOnServer(text) {
     // Check for a valid token
     var token = getCookie('token');
     if (!isValidToken(token)) {
-        console.error("Invalid token. Access denied.");
-        // Optionally, you can disable or hide functionality here
-        return;
+        logout()
     }
 
     // Create a new XMLHttpRequest object 
@@ -203,11 +191,9 @@ function deleteRecordOnServer(text) {
     xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             if (xhr.status == 200) {
-                console.log("Delete response received!");
-                // Update the record list after successful delete
                 getUsers();
             } else {
-                console.error("Failed to delete record.");
+                alert("Failed to delete record.");
             }
         }
     };
@@ -231,12 +217,9 @@ function sendDataCallback() {
     // Check if the response is ready
     if (xhr.readyState == 4) {
         if (xhr.status == 201) {
-            console.log("Data creation response received!");
-
-            // Update the record list with the new data
             getUsers();
         } else {
-            console.error("Failed to add data.");
+            alert("Failed to add data.");
         }
     }
 }
@@ -254,18 +237,14 @@ function sendData() {
     // Check for a valid token
     var token = getCookie('token');
     if (!isValidToken(token)) {
-        console.error("Invalid token. Access denied.");
-        // Optionally, you can disable or hide functionality here
-        return;
+        logout();
     }
 
     var dataToSend = xssFilters.inHTMLData(document.getElementById('data-input').value);
     if (!dataToSend) {
-        console.log("Data is empty.");
+        alert("Data is empty.");
         return;
     }
-
-    console.log("Sending data: " + dataToSend);
 
     // Create the data object with the desired structure
     var newData = {
@@ -281,12 +260,10 @@ function sendData() {
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
             if (xhr.status == 201) {
-                console.log("Data added successfully.");
-                // Optionally, update the UI or perform other actions
+                alert("Data added successfully.");
                 getUsers();
             } else {
-                console.error("Failed to add data.");
-                // Optionally, handle errors or display a message to the user
+                alert("Failed to add data.");
             }
         }
     };
