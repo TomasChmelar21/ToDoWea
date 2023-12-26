@@ -8,7 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
         var password = xssFilters.inHTMLData(document.getElementById('password').value)
 
         if (!username || !password) {
-            document.getElementById('loginError').innerText = "Nejsou vyplněná všechna okna";
+            alert("Nejsou vyplněná všechna okna");
             return;
         }
 
@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
         })
         .then(response => {
             if (!response.ok) {
-                console.log("Login failed.");
+                throw new Error("Login failed.");
             }
 
             return response.json();
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
         
             // Set the token and username as cookies with a 20-minute expiration time
             var expirationTime = new Date();
-            expirationTime.setTime(expirationTime.getTime() + (30 * 60 * 1000)); // 30 minutes
+            expirationTime.setTime(expirationTime.getTime() + (20 * 60 * 1000)); // 20 minutes
         
             document.cookie = `token=${encodeURIComponent(token)}; expires=${expirationTime.toUTCString()}; path=/`;
         
