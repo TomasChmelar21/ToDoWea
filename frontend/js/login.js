@@ -38,15 +38,16 @@ document.addEventListener("DOMContentLoaded", function () {
         
             // Set the token and username as cookies with a 20-minute expiration time
             var expirationTime = new Date();
-            expirationTime.setTime(expirationTime.getTime() + (20 * 60 * 1000)); // 20 minutes
+            expirationTime.setTime(expirationTime.getTime() + (30 * 60 * 1000)); // 30 minutes
         
             document.cookie = `token=${encodeURIComponent(token)}; expires=${expirationTime.toUTCString()}; path=/`;
-            document.cookie = `username=${encodeURIComponent(username)}; expires=${expirationTime.toUTCString()}; path=/`;
         
             window.location.href = './list.html';
         })
         .catch(error => {
             console.error("Login failed.", error);
+            // Display an error message on the webpage
+            document.getElementById('loginError').innerText = "Invalid credentials. Please try again.";
         });
     });
 });

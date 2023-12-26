@@ -31,7 +31,6 @@ function getCookie(name) {
 function logout() {
     // Clear the cookies
     document.cookie = 'token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie = 'username=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
 
     // Redirect the user to the login page
     window.location.href = './index.html';
@@ -42,7 +41,6 @@ function dataCallback() {
         if (xhr.status == 200) {
             console.log("User data received!");
             var token = getCookie('token');
-            var username = getCookie('username');
 
             if (isValidToken(token)) {
                 var dataDiv = document.getElementById('result-container');
@@ -54,8 +52,7 @@ function dataCallback() {
 
                     if (
                         (filterType === 'completed' && !isCompleted) ||
-                        (filterType === 'uncompleted' && isCompleted) ||
-                        (username !== item.user)
+                        (filterType === 'uncompleted' && isCompleted)
                     ) {
                         return '';
                     }
